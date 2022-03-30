@@ -1,6 +1,18 @@
 module Lib
-    ( someFunc
+    ( project
     ) where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import System.Environment
+
+splitSearchQuery searchQuery =  do
+    return ( concatMap words searchQuery )
+
+
+project :: IO ()
+project = do
+    userInput <- getArgs
+
+    splitUserInput <- splitSearchQuery userInput
+
+    print splitUserInput
+
