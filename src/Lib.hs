@@ -8,9 +8,7 @@ where
 import Data.Aeson
 import Data.ByteString.Lazy.Char8
 import Data.Map
-import Data.Maybe
 import Data.String
-import GHC.Generics
 import System.Directory
 import System.Environment
 import System.FilePath
