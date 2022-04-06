@@ -11,8 +11,6 @@ function run_project() {
         read -r -p $'\e[35mFPP λ >\e[0m ' input
     done
 
-    stack exec -- Functional-Programming-Project-exe "${input}"
-
     clear
 }
 
