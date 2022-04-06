@@ -1,4 +1,3 @@
-
 function runProject() {
     stack build
     Clear-Host
