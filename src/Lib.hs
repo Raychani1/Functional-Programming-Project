@@ -1,3 +1,5 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Lib
   ( project,
   )
@@ -16,10 +18,10 @@ getSearchQueries = do concatMap words <$> getArgs
 readData :: FilePath -> Int -> IO [String]
 readData filePath numberOfLines = do
   -- Read Contents of File
-  content <- readFile filePath
+  content :: String <- readFile filePath
 
   -- Split Content of File to Lines
-  let linesOfFiles = Data.String.lines content
+  let linesOfFiles :: [String] = Data.String.lines content
 
   -- Return the first [numberOfLines] Lines of Data
   return (Prelude.take numberOfLines linesOfFiles)
@@ -27,15 +29,15 @@ readData filePath numberOfLines = do
 project :: IO ()
 project = do
   -- Fetch Search Queries from CLI
-  searchQueries <- getSearchQueries
+  searchQueries :: [String] <- getSearchQueries
 
   print searchQueries
 
   -- Get Current Work Directory
-  cwd <- getCurrentDirectory
+  cwd :: FilePath <- getCurrentDirectory
 
   -- Read Input Data File
-  inputData <- readData (joinPath [cwd, "data", "data.json"]) 200
+  inputData :: [String] <- readData (joinPath [cwd, "data", "data.json"]) 200
 
   print inputData
 
