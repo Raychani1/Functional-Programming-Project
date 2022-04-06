@@ -1,18 +1,22 @@
 module Lib
-    ( project
-    ) where
+  ( project,
+  )
+where
 
+import Data.String
+import System.Directory
 import System.Environment
+import System.FilePath
 
-splitSearchQuery searchQuery =  do
-    return ( concatMap words searchQuery )
-
+-- | Returns List of Search Queries
+getSearchQueries :: IO [String]
+getSearchQueries = do concatMap words <$> getArgs
 
 project :: IO ()
 project = do
-    userInput <- getArgs
+  -- Fetch Search Queries from CLI
+  searchQueries <- getSearchQueries
 
-    splitUserInput <- splitSearchQuery userInput
+  print searchQueries
 
-    print splitUserInput
-
+  return ()
