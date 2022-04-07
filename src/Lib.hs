@@ -12,6 +12,7 @@ import Data.String
 import System.Directory
 import System.Environment
 import System.FilePath
+import Text.HTML.Scalpel
 import Text.Regex.TDFA
 
 -- | Returns List of Search Queries
@@ -35,6 +36,11 @@ maybeMapToMap :: Maybe (Map k v) -> Map k v
 maybeMapToMap (Just myMap) = myMap
 maybeMapToMap Nothing = Data.Map.empty
 
+-- | Converts Maybe String to Just String
+maybeStringToString :: Maybe String -> String
+maybeStringToString (Just myString) = myString
+maybeStringToString Nothing = ""
+
 project :: IO ()
 project = do
   -- Fetch Search Queries from CLI
@@ -48,7 +54,10 @@ project = do
 
   let dataMap :: Map String String = maybeMapToMap (Data.Aeson.decode (pack (Prelude.head inputData)) :: Maybe (Map String String))
 
-  let body = (dataMap ! "html_content") =~ "<body.*>([[:word:]|^[:word:]])<\\/body>" :: String -- Regex not matching
+  -- let body = (dataMap ! "html_content") =~ "<body[^>]*>([\\w\\W]*)<\\/body>" :: String -- Regex not matching
+
+  let body = maybeStringToString (scrapeStringLike (dataMap ! "html_content") (innerHTML (tagSelector "body")))
+
   print body
 
   return ()
