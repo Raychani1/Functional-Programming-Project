@@ -12,6 +12,7 @@ import Data.String
 import System.Directory
 import System.Environment
 import System.FilePath
+import Text.Regex.TDFA
 
 -- | Returns List of Search Queries
 getSearchQueries :: IO [String]
@@ -39,8 +40,6 @@ project = do
   -- Fetch Search Queries from CLI
   searchQueries :: [String] <- getSearchQueries
 
-  print searchQueries
-
   -- Get Current Work Directory
   cwd :: FilePath <- getCurrentDirectory
 
@@ -49,6 +48,7 @@ project = do
 
   let dataMap :: Map String String = maybeMapToMap (Data.Aeson.decode (pack (Prelude.head inputData)) :: Maybe (Map String String))
 
-  print (dataMap ! "url")
+  let body = (dataMap ! "html_content") =~ "<body.*>([[:word:]|^[:word:]])<\\/body>" :: String -- Regex not matching
+  print body
 
   return ()
