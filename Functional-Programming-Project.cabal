@@ -38,6 +38,7 @@ library
     , directory
     , filepath
     , regex-tdfa
+    , scalpel
   default-language: Haskell2010
 
 executable Functional-Programming-Project-exe
@@ -56,6 +57,7 @@ executable Functional-Programming-Project-exe
     , directory
     , filepath
     , regex-tdfa
+    , scalpel
   default-language: Haskell2010
 
 test-suite Functional-Programming-Project-test
@@ -75,4 +77,5 @@ test-suite Functional-Programming-Project-test
     , directory
     , filepath
     , regex-tdfa
+    , scalpel
   default-language: Haskell2010
