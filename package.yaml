@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/Functional-Programming-Project#readme>
+description:         Please see the README on GitHub at <https://github.com/Raychani1/Functional-Programming-Project#readme>
 
 dependencies:
 - aeson
@@ -26,6 +26,7 @@ dependencies:
 - containers
 - directory
 - filepath
+- regex-tdfa
 
 library:
   source-dirs: src

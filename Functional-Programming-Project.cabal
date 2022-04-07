@@ -6,7 +6,7 @@ cabal-version: 1.12
 
 name:           Functional-Programming-Project
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/Functional-Programming-Project#readme>
+description:    Please see the README on GitHub at <https://github.com/Raychani1/Functional-Programming-Project#readme>
 homepage:       https://github.com/Raychani1/Functional-Programming-Project#readme
 bug-reports:    https://github.com/Raychani1/Functional-Programming-Project/issues
 author:         Ladislav Rajcsányi
@@ -37,6 +37,7 @@ library
     , containers
     , directory
     , filepath
+    , regex-tdfa
   default-language: Haskell2010
 
 executable Functional-Programming-Project-exe
@@ -54,6 +55,7 @@ executable Functional-Programming-Project-exe
     , containers
     , directory
     , filepath
+    , regex-tdfa
   default-language: Haskell2010
 
 test-suite Functional-Programming-Project-test
@@ -72,4 +74,5 @@ test-suite Functional-Programming-Project-test
     , containers
     , directory
     , filepath
+    , regex-tdfa
   default-language: Haskell2010
