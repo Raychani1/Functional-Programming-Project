@@ -73,6 +73,20 @@ processBody body = do
 
   return uniqueWords
 
+processInput :: [String] -> Map String (Map String [String])
+processInput inputData = do
+  let dataMap :: Map String String = maybeMapToMap (Data.Aeson.decode (pack (Prelude.head inputData)) :: Maybe (Map String String))
+
+  let body = maybeStringToString (scrapeStringLike (dataMap ! "html_content") (innerHTML (tagSelector "body")))
+
+  let processedBody :: [String] = Prelude.concat (processBody body)
+
+  let url :: [String] = Data.String.lines (dataMap ! "url")
+
+  let result = Data.Map.fromList [("url", url), ("words", processedBody)]
+
+  return result
+
 -- | Converts Maybe Map to Just Map
 maybeMapToMap :: Maybe (Map k v) -> Map k v
 maybeMapToMap (Just myMap) = myMap
@@ -94,12 +108,8 @@ project = do
   -- Read Input Data File
   inputData :: [String] <- readData (joinPath [cwd, "data", "data.json"]) 200
 
-  let dataMap :: Map String String = maybeMapToMap (Data.Aeson.decode (pack (Prelude.head inputData)) :: Maybe (Map String String))
+  let result = processInput inputData
 
-  let body = maybeStringToString (scrapeStringLike (dataMap ! "html_content") (innerHTML (tagSelector "body")))
-
-  let processedBody = Prelude.concat (processBody body)
-
-  print processedBody
+  print result
 
   return ()
