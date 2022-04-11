@@ -30,6 +30,8 @@ dependencies:
 - hxt
 - regex-compat
 - scalpel
+- text
+- text-icu >= 0.7.0.1 && < 1
 
 library:
   source-dirs: src

@@ -41,6 +41,8 @@ library
     , hxt
     , regex-compat
     , scalpel
+    , text
+    , text-icu >=0.7.0.1 && <1
   default-language: Haskell2010
 
 executable Functional-Programming-Project-exe
@@ -62,6 +64,8 @@ executable Functional-Programming-Project-exe
     , hxt
     , regex-compat
     , scalpel
+    , text
+    , text-icu >=0.7.0.1 && <1
   default-language: Haskell2010
 
 test-suite Functional-Programming-Project-test
@@ -84,4 +88,6 @@ test-suite Functional-Programming-Project-test
     , hxt
     , regex-compat
     , scalpel
+    , text
+    , text-icu >=0.7.0.1 && <1
   default-language: Haskell2010
