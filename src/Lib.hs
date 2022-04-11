@@ -77,18 +77,17 @@ processBody body = uniqueWords
     accentRemoved :: String = canonicalForm breakLinesRemoved
 
     -- Remove Special Characters
-    specialCharactersOverwritten :: String = subRegex (mkRegex "\\\169|\\\186") accentRemoved " "
+    specialCharactersOverwritten :: String = subRegex (mkRegex "\\\169|\\\186|\\\187") accentRemoved " "
 
     specialCharactersRemoved :: String = subRegex (mkRegex "[^0-9a-zA-Z]+") specialCharactersOverwritten " "
 
     -- Get every unique word in HTML sorted lexicographically
     uniqueWords :: [String] = sort (Data.List.nub (Prelude.words (stringToLower specialCharactersRemoved)))
 
-processInput :: [String] -> Map String [String]
-processInput inputData = result
+-- | Processes one line of Input
+processInput :: Map String String -> Map String [String]
+processInput dataMap = result
   where
-    dataMap :: Map String String = maybeMapToMap (Data.Aeson.decode (pack (Prelude.head inputData)) :: Maybe (Map String String))
-
     body :: String = maybeStringToString (scrapeStringLike (dataMap ! "html_content") (innerHTML (tagSelector "body")))
 
     processedBody :: [String] = processBody body
@@ -96,6 +95,14 @@ processInput inputData = result
     url :: [String] = Data.String.lines (dataMap ! "url")
 
     result :: Map String [String] = Data.Map.fromList [("url", url), ("words", processedBody)]
+
+-- | Processes every line of Input
+processAllInputs :: [String] -> [Map String [String]]
+processAllInputs inputData = results
+  where
+    allData :: [Map String String] = [maybeMapToMap (Data.Aeson.decode (pack line) :: Maybe (Map String String)) | line <- inputData]
+
+    results :: [Map String [String]] = [processInput dataMap | dataMap <- allData]
 
 -- | Converts Maybe Map to Just Map
 maybeMapToMap :: Maybe (Map k v) -> Map k v
@@ -116,14 +123,10 @@ project = do
   cwd :: FilePath <- getCurrentDirectory
 
   -- Read Input Data File
-  inputData :: [String] <- readData (joinPath [cwd, "data", "data.json"]) 200
+  inputData :: [String] <- readData (joinPath [cwd, "data", "data.json"]) 3000
 
-  let dataMap :: Map String String = maybeMapToMap (Data.Aeson.decode (pack (Prelude.head inputData)) :: Maybe (Map String String))
+  let results = processAllInputs inputData
 
-  let body = maybeStringToString (scrapeStringLike (dataMap ! "html_content") (innerHTML (tagSelector "body")))
-
-  let result = processInput inputData
-
-  print (result ! "words")
+  print ((results !! 2) ! "words")
 
   return ()
