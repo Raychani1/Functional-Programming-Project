@@ -10,6 +10,9 @@ import Data.ByteString.Lazy.Char8
 import Data.List
 import Data.Map
 import Data.String
+import qualified Data.Text as T
+import Data.Text.ICU.Char
+import Data.Text.ICU.Normalize
 import Hakyll.Web.Html
 import System.Directory
 import System.Environment
@@ -20,7 +23,7 @@ import Text.XML.HXT.DOM.Util
 
 -- | Returns List of Search Queries
 getSearchQueries :: IO [String]
-getSearchQueries = do Prelude.concatMap Data.String.words <$> getArgs
+getSearchQueries = Prelude.concatMap Data.String.words <$> getArgs
 
 -- | Returns the first [numberOfLines] lines of Input Data
 readData :: FilePath -> Int -> IO [String]
@@ -34,58 +37,65 @@ readData filePath numberOfLines = do
   -- Return the first [numberOfLines] Lines of Data
   return (Prelude.take numberOfLines linesOfFiles)
 
+-- | Removes Accent from String
+-- | SOURCE: https://stackoverflow.com/a/44290219/14319439
+canonicalForm :: String -> String
+canonicalForm s = T.unpack noAccents
+  where
+    noAccents = T.filter (not . property Diacritic) normalizedText
+    normalizedText = normalize NFD (T.pack s)
+
 -- | Processes HTML Body
-processBody :: String -> [[String]]
-processBody body = do
-  let quotesAdded = subRegex (mkRegex "&quot;") body "\""
+processBody :: String -> [String]
+processBody body = uniqueWords
+  where
+    -- Replace HTML Quote Escape Character
+    quotesAdded :: String = subRegex (mkRegex "&quot;") body "\""
 
-  let apostropheAdded = subRegex (mkRegex "&#39;") quotesAdded "'"
+    -- Replace HTML Apostrophe Escape Character
+    apostropheAdded :: String = subRegex (mkRegex "&#39;") quotesAdded "'"
 
-  let ampersandAdded = subRegex (mkRegex "&amp;") apostropheAdded "&"
+    -- Replace HTML Ampersand Escape Character
+    ampersandAdded :: String = subRegex (mkRegex "&amp;") apostropheAdded "&"
 
-  let tagStartsAdded = subRegex (mkRegex "&lt;") ampersandAdded "<"
+    -- Replace HTML Greater Than Escape Character
+    tagStartsAdded :: String = subRegex (mkRegex "&lt;") ampersandAdded "<"
 
-  let tagEndsAdded = subRegex (mkRegex "&gt;") tagStartsAdded ">"
+    -- Replace HTML Less Than Escape Character
+    tagEndsAdded :: String = subRegex (mkRegex "&gt;") tagStartsAdded ">"
 
-  let removedBraces = subRegex (mkRegex "<[^>]*>|\\{[^\\}]*\\}|\\([^\\)]*\\)") tagEndsAdded " "
+    -- Remove braces and their content
+    removedBraces :: String = subRegex (mkRegex "<[^>]*>|\\{[^\\}]*\\}|\\([^\\)]*\\)") tagEndsAdded " "
 
-  let removedTags = stripTags removedBraces
+    -- Remove remaining tags from HTML
+    removedTags :: String = stripTags removedBraces
 
-  let breakLinesRemoved = subRegex (mkRegex "\\\n") removedTags " "
+    -- Remove break lines
+    breakLinesRemoved :: String = subRegex (mkRegex "\\\n") removedTags " "
 
-  let specialCharactersOverwritten1 = subRegex (mkRegex "\\\169|\\\186") breakLinesRemoved " "
+    -- Remove accent from HTML
+    accentRemoved :: String = canonicalForm breakLinesRemoved
 
-  let specialCharactersOverwritten2 = subRegex (mkRegex "\\\193|\\\224|\\\225|\\\226|\\\227") specialCharactersOverwritten1 "a"
+    -- Remove Special Characters
+    specialCharactersOverwritten :: String = subRegex (mkRegex "\\\169|\\\186") accentRemoved " "
 
-  let specialCharactersOverwritten3 = subRegex (mkRegex "\\\231") specialCharactersOverwritten2 "c"
+    specialCharactersRemoved :: String = subRegex (mkRegex "[^0-9a-zA-Z]+") specialCharactersOverwritten " "
 
-  let specialCharactersOverwritten4 = subRegex (mkRegex "\\\201|\\\233|\\\234") specialCharactersOverwritten3 "e"
+    -- Get every unique word in HTML sorted lexicographically
+    uniqueWords :: [String] = sort (Data.List.nub (Prelude.words (stringToLower specialCharactersRemoved)))
 
-  let specialCharactersOverwritten5 = subRegex (mkRegex "\\\205|\\\237") specialCharactersOverwritten4 "i"
+processInput :: [String] -> Map String [String]
+processInput inputData = result
+  where
+    dataMap :: Map String String = maybeMapToMap (Data.Aeson.decode (pack (Prelude.head inputData)) :: Maybe (Map String String))
 
-  let specialCharactersOverwritten6 = subRegex (mkRegex "\\\211|\\\243|\\\244|\\\245") specialCharactersOverwritten5 "o"
+    body :: String = maybeStringToString (scrapeStringLike (dataMap ! "html_content") (innerHTML (tagSelector "body")))
 
-  let specialCharactersOverwritten7 = subRegex (mkRegex "\\\218|\\\250") specialCharactersOverwritten6 "u"
+    processedBody :: [String] = processBody body
 
-  let specialCharactersRemoved = subRegex (mkRegex "[^0-9a-zA-Z]+") specialCharactersOverwritten7 " "
+    url :: [String] = Data.String.lines (dataMap ! "url")
 
-  let uniqueWords = sort (Data.List.nub (Prelude.words (stringToLower specialCharactersRemoved)))
-
-  return uniqueWords
-
-processInput :: [String] -> Map String (Map String [String])
-processInput inputData = do
-  let dataMap :: Map String String = maybeMapToMap (Data.Aeson.decode (pack (Prelude.head inputData)) :: Maybe (Map String String))
-
-  let body = maybeStringToString (scrapeStringLike (dataMap ! "html_content") (innerHTML (tagSelector "body")))
-
-  let processedBody :: [String] = Prelude.concat (processBody body)
-
-  let url :: [String] = Data.String.lines (dataMap ! "url")
-
-  let result = Data.Map.fromList [("url", url), ("words", processedBody)]
-
-  return result
+    result :: Map String [String] = Data.Map.fromList [("url", url), ("words", processedBody)]
 
 -- | Converts Maybe Map to Just Map
 maybeMapToMap :: Maybe (Map k v) -> Map k v
@@ -108,8 +118,12 @@ project = do
   -- Read Input Data File
   inputData :: [String] <- readData (joinPath [cwd, "data", "data.json"]) 200
 
+  let dataMap :: Map String String = maybeMapToMap (Data.Aeson.decode (pack (Prelude.head inputData)) :: Maybe (Map String String))
+
+  let body = maybeStringToString (scrapeStringLike (dataMap ! "html_content") (innerHTML (tagSelector "body")))
+
   let result = processInput inputData
 
-  print result
+  print (result ! "words")
 
   return ()
