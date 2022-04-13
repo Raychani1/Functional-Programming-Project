@@ -25,7 +25,9 @@ source-repository head
 
 library
   exposed-modules:
+      Converters
       Lib
+      Parser
   other-modules:
       Paths_Functional_Programming_Project
   hs-source-dirs:
