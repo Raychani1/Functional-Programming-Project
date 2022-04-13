@@ -67,18 +67,24 @@ processBody body = uniqueWords
 processInput :: Map String String -> Map String [String]
 processInput dataMap = result
   where
+    -- Extract body from HTML
     body :: String = maybeStringToString (scrapeStringLike (dataMap ! "html_content") (innerHTML (tagSelector "body")))
 
+    -- Process extracted body
     processedBody :: [String] = processBody body
 
+    -- Convert URL to List
     url :: [String] = Data.String.lines (dataMap ! "url")
 
-    result :: Map String [String] = Data.Map.fromList [("url", url), ("body", [body]), ("words", processedBody)]
+    -- Create new Map of Processed Data
+    result :: Map String [String] = Data.Map.fromList [("url", url), ("words", processedBody)]
 
 -- | Processes every line of Input
 processAllInputs :: [String] -> [Map String [String]]
 processAllInputs inputData = results
   where
+    -- Read Data to Map
     allData :: [Map String String] = [maybeMapToMap (Data.Aeson.decode (pack line) :: Maybe (Map String String)) | line <- inputData]
 
+    -- Process Data
     results :: [Map String [String]] = [processInput dataMap | dataMap <- allData]
