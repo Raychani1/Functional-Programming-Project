@@ -29,7 +29,7 @@ processBody :: String -> [String]
 processBody body = uniqueWords
   where
     -- Replace HTML Quote Escape Character
-    quotesAdded :: String = subRegex (mkRegex "&quot;") body "\""
+    quotesAdded :: String = subRegex (mkRegex "&quot;") (Data.String.fromString body) "\""
 
     -- Replace HTML Apostrophe Escape Character
     apostropheAdded :: String = subRegex (mkRegex "&#39;") quotesAdded "'"
@@ -50,15 +50,16 @@ processBody body = uniqueWords
     removedTags :: String = stripTags removedBraces
 
     -- Remove break lines
-    breakLinesRemoved :: String = subRegex (mkRegex "\\\n") removedTags " "
+    breakLinesRemoved :: String = subRegex (mkRegex "\\\n|\\\\") removedTags " "
 
     -- Remove accent from HTML
     accentRemoved :: String = canonicalForm breakLinesRemoved
 
     -- Remove Special Characters
-    specialCharactersOverwritten :: String = subRegex (mkRegex "\\\147|\\\148|\\\149\\\163|\\\167|\\\169|\\\170|\\\173|\\\176|\\\186|\\\187|\\\191|\\\215") accentRemoved " "
+    -- specialCharactersOverwritten :: String = subRegex (mkRegex "\\\141|\\\147|\\\148|\\\149|\\\163|\\\167|\\\169|\\\170|\\\171|\\\173|\\\176|\\\178|\\\185|\\\186|\\\187|\\\191|\\\215|\\\305|\\\601|\\\8216|\\\8594|\\\65279") accentRemoved ""
+    -- specialCharactersOverwritten :: String = escape accentRemoved
 
-    specialCharactersRemoved :: String = subRegex (mkRegex "[^0-9a-zA-Z]+") specialCharactersOverwritten " "
+    specialCharactersRemoved :: String = subRegex (mkRegex "[^0-9a-zA-Z]+") accentRemoved " "
 
     -- Get every unique word in HTML sorted lexicographically
     uniqueWords :: [String] = sort (Data.List.nub (Prelude.words (stringToLower specialCharactersRemoved)))
