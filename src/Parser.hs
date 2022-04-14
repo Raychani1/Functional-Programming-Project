@@ -55,11 +55,11 @@ processBody body = uniqueWords
     -- Remove accent from HTML
     accentRemoved :: String = canonicalForm breakLinesRemoved
 
+    -- TODO - Find better solution
     -- Remove Special Characters
-    -- specialCharactersOverwritten :: String = subRegex (mkRegex "\\\141|\\\147|\\\148|\\\149|\\\163|\\\167|\\\169|\\\170|\\\171|\\\173|\\\176|\\\178|\\\185|\\\186|\\\187|\\\191|\\\215|\\\305|\\\601|\\\8216|\\\8594|\\\65279") accentRemoved ""
-    -- specialCharactersOverwritten :: String = escape accentRemoved
+    specialCharactersOverwritten :: String = subRegex (mkRegex "\\\141|\\\145|\\\147|\\\148|\\\149|\\\163|\\\167|\\\169|\\\170|\\\171|\\\173|\\\174|\\\176|\\\178|\\\179|\\\185|\\\186|\\\187|\\\189|\\\191") accentRemoved ""
 
-    specialCharactersRemoved :: String = subRegex (mkRegex "[^0-9a-zA-Z]+") accentRemoved " "
+    specialCharactersRemoved :: String = subRegex (mkRegex "[^0-9a-zA-Z]+") specialCharactersOverwritten " "
 
     -- Get every unique word in HTML sorted lexicographically
     uniqueWords :: [String] = sort (Data.List.nub (Prelude.words (stringToLower specialCharactersRemoved)))

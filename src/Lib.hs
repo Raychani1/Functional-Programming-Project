@@ -10,7 +10,6 @@ import Parser
 import System.Directory
 import System.Environment
 import System.FilePath
-import System.IO
 
 -- | Returns List of Search Queries
 getSearchQueries :: IO [String]
@@ -40,16 +39,5 @@ project = do
   inputData :: [String] <- readData (joinPath [cwd, "data", "data.json"]) 3000
 
   let results = processAllInputs inputData
-
-  -- let resultsLedger = [(i, results !! i) | i <- [168]]
-  let resultsLedger = [(i, results !! i) | i <- [168]]
-
-  outh <- openFile (joinPath [cwd, "output", "output168.txt"]) WriteMode
-  hPrint outh resultsLedger
-  hClose outh
-
-  outh <- openFile (joinPath [cwd, "output", "input_168.txt"]) WriteMode
-  hPrint outh (inputData !! 168)
-  hClose outh
 
   return ()
