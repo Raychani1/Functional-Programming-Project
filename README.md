@@ -1,8 +1,6 @@
 
 # Functional Programming Project
 
-  
-
 ## About The Project
 
 Simple Search Engine created for the [Functional Programming](https://uim.fei.stuba.sk/predmet/funkcionalne-programovanie/) course at [FEI STU](https://www.fei.stuba.sk/). 
@@ -15,8 +13,9 @@ The main objective of this project is to create a small Search Engine for a coll
 
 - #### Data
 	- Download `data.json` ( First 3000 Web Pages from the [HTML BR Collection](https://www.kaggle.com/datasets/aldebbaran/html-br-collection) Dataset ) from [Google Drive](https://drive.google.com/drive/folders/1DTC8XToIGMoLWK8RKyUEkF1v--1N3i-W?usp=sharing), and place it in the `data` sub-folder in the Project root folder.
+
 - #### GHC and Stack
-  - Follow the instructions on the [GHCup Website](https://www.haskell.org/ghcup/)
+  - Follow the instructions on the [GHCup Website](https://www.haskell.org/ghcup/).
 
 ## Usage
 
@@ -47,7 +46,5 @@ Distributed under the **BSD-3-Clause License**. See [LICENSE](https://github.com
 ## Contact
 - Ladislav Rajcsányi -  [Raychani1](https://github.com/Raychani1)  -  [rajcsanyi.ladislav.it@gmail.com](mailto:rajcsanyi.ladislav.it@gmail.com)
 - Enikő Villantová -  [enivill](https://github.com/enivill)
-
 - Patrik Gúgh -  [gughpatrik619](https://github.com/gughpatrik619)
-
 - Jana Vlčková-  [xvlckova](https://github.com/xvlckova)
