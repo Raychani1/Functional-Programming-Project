@@ -14,6 +14,8 @@ import Data.List (iterate', head, map)
 import System.Directory
 import System.Environment
 import System.FilePath
+import qualified Data.Map as M
+import Data.Typeable
 import System.IO(IOMode(WriteMode), openFile, hClose, hPrint)
 
 -- | Returns List of Search Queries
@@ -38,26 +40,18 @@ project = do
   -- -- Fetch Search Queries from CLI
   searchQueries :: [String] <- getSearchQueries
 
-  -- print searchQueries
-
   -- Get Current Work Directory
   cwd :: FilePath <- getCurrentDirectory
-
 
   -- -- Read Input Data File
   inputData :: [String] <- readData (joinPath [cwd, "data", "test_data.json"]) 30
 
-  
   let processData = processAllInputs inputData
   let forPageRank = processForPageRank processData
   let result = iterate calculatePageRanks forPageRank !! 50
   -- if you want delete some key:value pair, you can do so by in Lib.hs in class calculateNewPageRank
 
-
-  -- Write results to file
-  -- let resultsLedger = [(i, results !! i ) | i <- [0 .. 10]]
-  outh <- openFile (joinPath [cwd, "output.txt"]) WriteMode
-  hPrint outh result
-  hClose outh
+  -- reverse index
+  let resultReverseIndexed = rvProcessReverseIndex result
 
   return ()
