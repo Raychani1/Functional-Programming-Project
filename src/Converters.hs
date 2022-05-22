@@ -11,3 +11,8 @@ maybeMapToMap Nothing = Data.Map.empty
 maybeStringToString :: Maybe String -> String
 maybeStringToString (Just myString) = myString
 maybeStringToString Nothing = ""
+
+-- | Converts Maybe [String] to Just [String]
+maybeStringListToStringList :: Maybe [String] -> [String]
+maybeStringListToStringList (Just myString) = myString
+maybeStringListToStringList Nothing = [""]
