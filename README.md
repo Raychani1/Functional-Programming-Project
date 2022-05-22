@@ -36,9 +36,9 @@ Once the program is running enter the search queries to the Terminal. To exit th
 
 - [x] Implement Command Line Interface for Linux and Windows
 - [x] Implement HTML Parser
-- [ ] Implement Page Rank
-- [ ] Implement Reverse Index
-- [ ] Implement Search Functionality
+- [x] Implement Page Rank
+- [x] Implement Reverse Index
+- [x] Implement Search Functionality
 
 ## License
 Distributed under the **BSD-3-Clause License**. See [LICENSE](https://github.com/Raychani1/Functional-Programming-Project/blob/main/LICENSE) for more information.
@@ -50,7 +50,7 @@ Distributed under the **BSD-3-Clause License**. See [LICENSE](https://github.com
 - Jana Vlčková-  [xvlckova](https://github.com/xvlckova)
 
 
-Literature:
+## Literature:
 https://www.ccs.neu.edu/home/vip/teach/IRcourse/4_webgraph/notes/Pagerank%20Explained%20Correctly%20with%20Examples.html
 
 http://papers.cumincad.org/data/works/att/2873.content.pdf
