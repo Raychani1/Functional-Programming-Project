@@ -80,15 +80,15 @@ processHyperlink body = hyperlinks
 
 
 -- | Processes one line of Input
-processInput :: Map String String -> Map String [String] 
+processInput :: Map String String -> Map String [String]
 processInput dataMap = result
   where
     -- Extract body from HTML
     body :: String = maybeStringToString (scrapeStringLike (dataMap ! "html_content") (innerHTML (tagSelector "body")))
-    
+
     -- Extract hyperlinks from body
     hyperlinks :: [String] = (processHyperlink body)
-    
+
     -- Process extracted body
     processedBody :: [String] = processBody body
 
@@ -107,13 +107,13 @@ processAllInputs inputData = results
     -- Read Data to Map
     allData :: [Map String String] = [maybeMapToMap (Data.Aeson.decode (pack line) :: Maybe (Map String String)) | line <- inputData]
     -- Process Data
-    results :: [Map String [String]]  = [processInput dataMap | dataMap <- allData] 
-    
+    results :: [Map String [String]]  = [processInput dataMap | dataMap <- allData]
+
 -- | called from processForPageRank
 incomingLinks :: [Map String [String]] -> [Map String [String]]
 incomingLinks dataMap = result
   where
-    urls :: [String] = Data.List.concat $ Data.List.map (\x -> (x Data.Map.! "url")) dataMap 
+    urls :: [String] = Data.List.concat $ Data.List.map (\x -> (x Data.Map.! "url")) dataMap
     result :: [Map String [String]] = Data.List.map (\url -> processUrl url dataMap) urls
 
 
@@ -131,9 +131,9 @@ processUrl url dataMap = result
 processForPageRank :: [Map String [String]] ->  [Map String [String]]
 processForPageRank inputData = results
   where
-    results :: [Map String [String]] = incomingLinks inputData 
+    results :: [Map String [String]] = incomingLinks inputData
 
-calculatePageRanks :: [Map String [String]] -> [Map String [String]] 
+calculatePageRanks :: [Map String [String]] -> [Map String [String]]
 calculatePageRanks dataMap = calculate
   where
     calculate :: [Map String [String]] = Data.List.map (\x -> calculateNewPageRank x dataMap) dataMap
@@ -164,3 +164,25 @@ getPageRank url dataMap = read $ Data.List.head $ Data.List.head (Data.List.filt
 
 getWords :: String -> [Map String [String]] -> [String]
 getWords url dataMap = Data.List.head (Data.List.filter (\x -> url `Data.List.elem` ( x Data.Map.! "url" )) dataMap ) Data.Map.! "words"
+
+-- | Reverse index functions
+rvProcessReverseIndex :: [Map String [String]] -> [Map String [String]]
+rvProcessReverseIndex inputMapList = resultMapList
+  where
+    -- collect all words
+    allWords = Data.List.concat $ Data.List.map (\x -> (x Data.Map.! "words")) inputMapList
+
+    -- construct map for words and urls that contain that specific word
+    resultMapList = Data.List.map (\word -> rvProcessWord word inputMapList) allWords
+
+rvProcessWord :: String -> [Map String [String]] -> Map String [String]
+rvProcessWord word inputMapList = resultMap
+  where
+    -- filter input map: include only those entries, which contain 'word'
+    filteredInputMapList :: [Map String [String]] = Data.List.filter (\entry -> word `Data.List.elem` (entry Data.Map.! "words")) inputMapList
+
+    -- map entries to list of strings (list of urls)
+    urls :: [String] = Data.List.map (\x -> Data.List.head (x Data.Map.! "url")) filteredInputMapList
+
+    -- collect 'word' and corresponding urls in a map
+    resultMap :: Map String [String] = Data.Map.fromList [("word", [word]), ("urls", urls)]

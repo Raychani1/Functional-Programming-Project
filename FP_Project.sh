@@ -2,7 +2,6 @@
 
 function run_project() {
     stack build
-    clear
 
     read -r -p $'\e[35mFPP λ >\e[0m ' input
 
