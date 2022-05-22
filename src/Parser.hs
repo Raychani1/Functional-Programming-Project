@@ -58,7 +58,6 @@ processBody body = uniqueWords
     -- Remove accent from HTML
     accentRemoved :: String = canonicalForm breakLinesRemoved
 
-    -- TODO - Find better solution
     -- Remove Special Characters
     specialCharactersOverwritten :: String = subRegex (mkRegex "\\\141|\\\145|\\\147|\\\148|\\\149|\\\163|\\\167|\\\169|\\\170|\\\171|\\\173|\\\174|\\\176|\\\178|\\\179|\\\185|\\\186|\\\187|\\\189|\\\191") accentRemoved ""
 
@@ -166,7 +165,7 @@ getWords :: String -> [Map String [String]] -> [String]
 getWords url dataMap = Data.List.head (Data.List.filter (\x -> url `Data.List.elem` ( x Data.Map.! "url" )) dataMap ) Data.Map.! "words"
 
 -- | Reverse index functions
-rvProcessReverseIndex :: [Map String [String]] -> [Map String [String]]
+rvProcessReverseIndex :: [Map String [String]] -> [(String, [(String, Double)])]
 rvProcessReverseIndex inputMapList = resultMapList
   where
     -- collect all words
@@ -175,14 +174,14 @@ rvProcessReverseIndex inputMapList = resultMapList
     -- construct map for words and urls that contain that specific word
     resultMapList = Data.List.map (\word -> rvProcessWord word inputMapList) allWords
 
-rvProcessWord :: String -> [Map String [String]] -> Map String [String]
+rvProcessWord :: String -> [Map String [String]] -> (String, [(String, Double)])
 rvProcessWord word inputMapList = resultMap
   where
     -- filter input map: include only those entries, which contain 'word'
     filteredInputMapList :: [Map String [String]] = Data.List.filter (\entry -> word `Data.List.elem` (entry Data.Map.! "words")) inputMapList
 
     -- map entries to list of strings (list of urls)
-    urls :: [String] = Data.List.map (\x -> Data.List.head (x Data.Map.! "url")) filteredInputMapList
+    urls :: [(String, Double)] = Data.List.map (\x -> (Data.List.head (x Data.Map.! "url"), read (Data.List.head (x Data.Map.! "page_rank")))) filteredInputMapList
 
     -- collect 'word' and corresponding urls in a map
-    resultMap :: Map String [String] = Data.Map.fromList [("word", [word]), ("urls", urls)]
+    resultMap :: (String, [(String, Double)]) = (word, urls)

@@ -16,3 +16,8 @@ maybeStringToString Nothing = ""
 maybeStringListToStringList :: Maybe [String] -> [String]
 maybeStringListToStringList (Just myString) = myString
 maybeStringListToStringList Nothing = [""]
+
+-- | Converts Maybe [(String, [(String, String)])] to Just [(String, [(String, String)])]
+maybeNightmareObjectToObject :: Maybe [(String, [(String, Double)])] -> [(String, [(String, Double)])]
+maybeNightmareObjectToObject (Just obj) = obj
+maybeNightmareObjectToObject Nothing = []

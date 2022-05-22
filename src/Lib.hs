@@ -8,19 +8,18 @@ where
 import Data.String
 import Data.Typeable
 import Data.Function
+import Data.ByteString.Lazy.Char8
+import qualified Data.ByteString.Lazy as DBL
 import Parser
+import System.IO
 import Data.Map
+import Data.Aeson
 import Data.List (iterate', head, map)
 import System.Directory
-import System.Environment
 import System.FilePath
 import qualified Data.Map as M
 import Data.Typeable
-import System.IO(IOMode(WriteMode), openFile, hClose, hPrint)
-
--- | Returns List of Search Queries
-getSearchQueries :: IO [String]
-getSearchQueries = Prelude.concatMap Data.String.words <$> getArgs
+import Converters
 
 -- | Returns the first [numberOfLines] lines of Input Data
 readData :: FilePath -> Int -> IO [String]
@@ -36,10 +35,6 @@ readData filePath numberOfLines = do
 
 project :: IO ()
 project = do
-
-  -- -- Fetch Search Queries from CLI
-  searchQueries :: [String] <- getSearchQueries
-
   -- Get Current Work Directory
   cwd :: FilePath <- getCurrentDirectory
 
@@ -48,10 +43,14 @@ project = do
 
   let processData = processAllInputs inputData
   let forPageRank = processForPageRank processData
-  let result = iterate calculatePageRanks forPageRank !! 50
+  let result = Prelude.iterate calculatePageRanks forPageRank !! 50
   -- if you want delete some key:value pair, you can do so by in Lib.hs in class calculateNewPageRank
 
   -- reverse index
   let resultReverseIndexed = rvProcessReverseIndex result
+
+  -- save reverse index result as json
+  let resultReverseIndexedEncodedJson = Data.Aeson.encode $ toJSON resultReverseIndexed
+  DBL.writeFile "data/output.json" resultReverseIndexedEncodedJson
 
   return ()
