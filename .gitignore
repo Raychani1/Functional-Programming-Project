@@ -23,3 +23,5 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+data/
+data/data.json
