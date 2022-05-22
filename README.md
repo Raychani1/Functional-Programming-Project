@@ -48,3 +48,12 @@ Distributed under the **BSD-3-Clause License**. See [LICENSE](https://github.com
 - Enikő Villantová -  [enivill](https://github.com/enivill)
 - Patrik Gúgh -  [gughpatrik619](https://github.com/gughpatrik619)
 - Jana Vlčková-  [xvlckova](https://github.com/xvlckova)
+
+
+Literature:
+https://www.ccs.neu.edu/home/vip/teach/IRcourse/4_webgraph/notes/Pagerank%20Explained%20Correctly%20with%20Examples.html
+
+http://papers.cumincad.org/data/works/att/2873.content.pdf
+
+http://ianrogers.uk/gpr/pr11.pl/
+
