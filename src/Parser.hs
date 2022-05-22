@@ -109,13 +109,15 @@ processAllInputs inputData = results
     -- Process Data
     results :: [Map String [String]]  = [processInput dataMap | dataMap <- allData] 
     
-
+-- | called from processForPageRank
 incomingLinks :: [Map String [String]] -> [Map String [String]]
 incomingLinks dataMap = result
   where
     urls :: [String] = Data.List.concat $ Data.List.map (\x -> (x Data.Map.! "url")) dataMap 
     result :: [Map String [String]] = Data.List.map (\url -> processUrl url dataMap) urls
 
+
+-- | called from incomingLinks
 processUrl :: String -> [Map String [String]] -> Map String [String]
 processUrl url dataMap = result
   where
@@ -125,6 +127,7 @@ processUrl url dataMap = result
     words :: [String] = getWords url dataMap
     result :: Map String [String] = Data.Map.fromList [("url", [url]), ("links_in", urlsIn), ("links_out", urlsOut), ("page_rank", ["0"]), ("words", words)]
 
+-- | calculates and adds "links_in" key:value pair
 processForPageRank :: [Map String [String]] ->  [Map String [String]]
 processForPageRank inputData = results
   where
@@ -134,7 +137,8 @@ calculatePageRanks :: [Map String [String]] -> [Map String [String]]
 calculatePageRanks dataMap = calculate
   where
     calculate :: [Map String [String]] = Data.List.map (\x -> calculateNewPageRank x dataMap) dataMap
-    
+
+-- | called from calculatePageRanks
 calculateNewPageRank :: Map String [String] -> [Map String [String]] -> Map String [String]
 calculateNewPageRank mapEntry dataMap = result
   where
@@ -147,6 +151,8 @@ calculateNewPageRank mapEntry dataMap = result
     newPageRank = (1 - d) + d * (Data.Foldable.sum linksInNumbers)
     result = Data.Map.fromList [("url", [url]), ("links_in", links_in), ("links_out", (mapEntry ! "links_out")), ("page_rank", [show newPageRank]), ("words", words)]
 
+
+-- | Helper functions, gains value from data by its key
 getLinksOut :: String -> [Map String [String]] -> [String]
 getLinksOut url dataMap = Data.List.head (Data.List.filter (\x -> url `Data.List.elem` ( x Data.Map.! "url" )) dataMap ) Data.Map.! "links_out"
 

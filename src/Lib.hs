@@ -34,28 +34,13 @@ readData filePath numberOfLines = do
 
 project :: IO ()
 project = do
-  -- | Remove duplicates from [String]
-  -- removeDuplicates :: [String] -> [String]
-  -- removeDuplicates [] = []
-  -- removeDuplicates (x:xs) = x : (removeDuplicates (remove x xs))
-  --   where 
-  --     remove :: String -> [String] -> [String]
-  --     remove x [] = []
-  --     remove x (y:ys) 
-  --       | x == y = remove x ys
-  --       | otherwise = y:(remove x ys)
-  -- myFix :: (Ord a, Floating a) => a -> a
-  -- myFix x = converge (\x y -> abs(x-y) < 0.0001) $ iterate' f x 
-  --   where f = cos
 
-  -- print myFix 400.0
-  
   -- -- Fetch Search Queries from CLI
   searchQueries :: [String] <- getSearchQueries
 
   -- print searchQueries
 
-  -- -- Get Current Work Directory
+  -- Get Current Work Directory
   cwd :: FilePath <- getCurrentDirectory
 
 
