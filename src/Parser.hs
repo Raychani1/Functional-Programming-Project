@@ -67,17 +67,7 @@ processBody body = uniqueWords
     -- Get every unique word in HTML sorted lexicographically
     uniqueWords :: [String] = sort (Data.List.nub (Prelude.words (stringToLower specialCharactersRemoved)))
 
--- | Remove duplicates from [String]
--- removeDuplicates :: [String] -> [String]
--- removeDuplicates [] = []
--- removeDuplicates (x:xs) = x : (removeDuplicates (remove x xs))
---   where 
---     remove :: String -> [String] -> [String]
---     remove x [] = []
---     remove x (y:ys) 
---       | x == y = remove x ys
---       | otherwise = y:(remove x ys)
-
+-- | Remove duplicates from list
 removeDuplicates :: (Ord a) => [a] -> [a]
 removeDuplicates = Data.List.map Data.List.head . Data.List.group . sort
 
@@ -112,16 +102,13 @@ processInput dataMap = result
 
 -- | Processes every line of Input
 processAllInputs :: [String] -> [Map String [String]]
---processAllInputs :: [String] -> [ [String]]
 processAllInputs inputData = results
   where
     -- Read Data to Map
     allData :: [Map String String] = [maybeMapToMap (Data.Aeson.decode (pack line) :: Maybe (Map String String)) | line <- inputData]
-
     -- Process Data
     results :: [Map String [String]]  = [processInput dataMap | dataMap <- allData] 
-    --results :: [ [String]] = [processHyperlink dataMap | dataMap <- allData]
-    --results :: [Map String String] = allData
+    
 
 incomingLinks :: [Map String [String]] -> [Map String [String]]
 incomingLinks dataMap = result
@@ -135,7 +122,8 @@ processUrl url dataMap = result
     filterDataMap :: [Map String [String]]= Data.List.filter (\x -> url `Data.List.elem` ( x Data.Map.! "links_out" )) dataMap
     urlsIn :: [String] = Data.List.map (\x -> Data.List.head (x Data.Map.! "url")) filterDataMap
     urlsOut ::[String] = getLinksOut url dataMap
-    result :: Map String [String] = Data.Map.fromList [("url", [url]), ("links_in", urlsIn), ("links_out", urlsOut), ("page_rank", ["0"])]
+    words :: [String] = getWords url dataMap
+    result :: Map String [String] = Data.Map.fromList [("url", [url]), ("links_in", urlsIn), ("links_out", urlsOut), ("page_rank", ["0"]), ("words", words)]
 
 processForPageRank :: [Map String [String]] ->  [Map String [String]]
 processForPageRank inputData = results
@@ -152,17 +140,15 @@ calculateNewPageRank mapEntry dataMap = result
   where
     d = 0.85
     url = Data.List.head $ mapEntry ! "url"
+    words = getWords url dataMap
     links_in = mapEntry ! "links_in"
     page_rank = Data.List.head $ mapEntry ! "page_rank"
     linksInNumbers :: [Double] = Data.List.map (\x -> getPageRank x dataMap / fromIntegral (Data.List.length (getLinksOut x dataMap)) ) links_in
     newPageRank = (1 - d) + d * (Data.Foldable.sum linksInNumbers)
-    result = Data.Map.fromList [("url", [url]), ("links_in", links_in), ("links_out", (mapEntry ! "links_out")), ("page_rank", [show newPageRank])]
-
-    
+    result = Data.Map.fromList [("url", [url]), ("links_in", links_in), ("links_out", (mapEntry ! "links_out")), ("page_rank", [show newPageRank]), ("words", words)]
 
 getLinksOut :: String -> [Map String [String]] -> [String]
 getLinksOut url dataMap = Data.List.head (Data.List.filter (\x -> url `Data.List.elem` ( x Data.Map.! "url" )) dataMap ) Data.Map.! "links_out"
-
 
 getLinksIn :: String -> [Map String [String]] -> [String]
 getLinksIn url dataMap = Data.List.head (Data.List.filter (\x -> url `Data.List.elem` ( x Data.Map.! "url" )) dataMap ) Data.Map.! "links_in"
@@ -170,3 +156,5 @@ getLinksIn url dataMap = Data.List.head (Data.List.filter (\x -> url `Data.List.
 getPageRank :: String -> [Map String [String]] -> Double
 getPageRank url dataMap = read $ Data.List.head $ Data.List.head (Data.List.filter (\x -> url `Data.List.elem` ( x Data.Map.! "url" )) dataMap ) Data.Map.! "page_rank"
 
+getWords :: String -> [Map String [String]] -> [String]
+getWords url dataMap = Data.List.head (Data.List.filter (\x -> url `Data.List.elem` ( x Data.Map.! "url" )) dataMap ) Data.Map.! "words"

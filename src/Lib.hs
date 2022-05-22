@@ -60,62 +60,19 @@ project = do
 
 
   -- -- Read Input Data File
-  inputData :: [String] <- readData (joinPath [cwd, "data", "data.json"]) 100
+  inputData :: [String] <- readData (joinPath [cwd, "data", "test_data.json"]) 30
 
   
-  let results = processAllInputs inputData
-
-  --print results
-
-  let forPageRank = processForPageRank results
-
-
-  let a = iterate calculatePageRanks forPageRank !! 40
-
-  print (Data.List.map (\x -> Data.List.head (x ! "page_rank")) a)
+  let processData = processAllInputs inputData
+  let forPageRank = processForPageRank processData
+  let result = iterate calculatePageRanks forPageRank !! 50
+  -- if you want delete some key:value pair, you can do so by in Lib.hs in class calculateNewPageRank
 
 
-
-
-  
-
-  -- let pageRanks = calculatePageRanks forPageRank
-  -- print (Data.List.map (\x -> Data.List.head (x ! "page_rank")) pageRanks)
-  -- let pageRanks2 = calculatePageRanks pageRanks
-  -- print (Data.List.map (\x -> Data.List.head (x ! "page_rank")) pageRanks2)
-  -- pageRanks = calculatePageRanks pageRanks
-  -- print (Data.Map.map (\x -> Data.List.head (x ! "page_rank")) pageRanks)
-  -- pageRanks = calculatePageRanks pageRanks
-  -- print (Data.Map.map (\x -> Data.List.head (x ! "page_rank")) pageRanks)
-  -- pageRanks = calculatePageRanks pageRanks
-  -- print (Data.Map.map (\x -> Data.List.head (x ! "page_rank")) pageRanks)
-  -- pageRanks = calculatePageRanks pageRanks
-  -- print (Data.Map.map (\x -> Data.List.head (x ! "page_rank")) pageRanks)
-
-  --print $ results
-  -- print $ forPageRank
-
-  -- let url = ( head(results) ! "url")
-
-  --print (url `elem` ["https://www.one.com", "valami mas"])
-  --print (url `elem` ["https://wwws.one.com", "valami mas"])
-
-  -- let results = inputData
   -- Write results to file
   -- let resultsLedger = [(i, results !! i ) | i <- [0 .. 10]]
-
-  -- outh <- openFile (joinPath [cwd, "output.txt"]) WriteMode
-  -- hPrint outh results
-  -- hClose outh
-
-  -- print  $ head results
-  -- print (show(typeOf results))
-
-
-  -- print $ toList $ head results
-
-  -- --fromListToList :: [Map String [String]] -> [Map String [String]]
-
-  -- print $ show(typeOf (toList $ head results))
+  outh <- openFile (joinPath [cwd, "output.txt"]) WriteMode
+  hPrint outh result
+  hClose outh
 
   return ()
